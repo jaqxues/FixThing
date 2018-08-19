@@ -6,6 +6,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
+import static de.robv.android.xposed.XposedBridge.log;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
@@ -32,13 +33,18 @@ public class HookManager implements IXposedHookLoadPackage {
                 "com.snapchat.android.app.feature.discover.model.ChannelPage",
                 lpparam.classLoader,
                 "com.snapchat.android.app.feature.discover.model.ChannelPage$a", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                if (getObjectField(param.args[0], var1) == null)
-                    setObjectField(param.args[0], var1, 1000);
-                if (getObjectField(param.args[0], var2) == null)
-                    setObjectField(param.args[0], var2, 1000);
-            }
-        });
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        try {
+                            if (getObjectField(param.args[0], var1) == null)
+                                setObjectField(param.args[0], var1, 1000);
+                            if (getObjectField(param.args[0], var2) == null)
+                                setObjectField(param.args[0], var2, 1000);
+                        } catch (Throwable t) {
+                            log("The \"FixThing\" Module is useless if this exception is thrown. The fields that cause the crashes have not been found, probably because this version of Snapchat is not supported. You can uninstall FixThing");
+                            log(t);
+                        }
+                    }
+                });
     }
 }
